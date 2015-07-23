@@ -23,6 +23,7 @@
 
 #include <memory>
 #include <windows.h>
+#include <unistd.h>
 
 class WinSerialPort : public SerialPort
 {
@@ -35,6 +36,9 @@ public:
               SerialPort::Parity parity = SerialPort::ParityNone,
               SerialPort::StopBit stop = SerialPort::StopBitOne);
     void close();
+
+	bool initcmd();
+	bool endcmd();
 
     bool isUsb() { return _isUsb; };
 

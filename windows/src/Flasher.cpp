@@ -260,7 +260,7 @@ Flasher::lock(string& regionArg, bool enable)
         do
         {
             delim = regionArg.find(',', pos);
-            sub = regionArg.substr(pos, delim < 0 ? -1 : delim - pos);
+            sub = regionArg.substr(pos, delim < 0 ? 0xFFFFFFFF : delim - pos);
             region = strtol(sub.c_str(), NULL, 0);
             printf("%s region %d\n", enable ? "Lock" : "Unlock", region);
             _flash->setLockRegion(region, enable);

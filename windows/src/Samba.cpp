@@ -55,6 +55,7 @@ Samba::init()
     uint8_t cmd[3];
     uint32_t cid;
 
+    _port->initcmd();
     _port->timeout(TIMEOUT_QUICK);
 
     // Allows Arduino auto-reset
@@ -77,6 +78,7 @@ Samba::init()
         _port->read(cmd, 3);
     }
 
+	usleep(100);
     // Set binary mode
     if (_debug)
         printf("Set binary mode\n");

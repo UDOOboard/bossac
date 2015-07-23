@@ -1,3 +1,15 @@
+Build notes:
+
+To build BOSSAC on Windows, install cygwin (x86) with gcc, w32api and ncurses packages.
+Run compile.sh
+Ignore widgets-related errors, the binary is build anyway.
+
+If you get errors from missing tchar.h, copy it from
+  cygwin\i868-pc-mingw32\sys-root\mingw\include
+to
+  cygwin\usr\include\w32api
+
+
 BOSSA 1.2 for Arduino Due
 
 This version of BOSSA is a fork of the original project and contains some

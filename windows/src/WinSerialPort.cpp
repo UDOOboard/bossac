@@ -23,6 +23,70 @@
 #include <limits.h>
 #include <stdio.h>
 
+
+void
+setdtr (HANDLE hSerial, int on)
+{
+	BOOL bRet;
+	DWORD dwFunc;
+
+	//printf("setdtr()\n");
+
+	if(on)
+	{
+		dwFunc = SETDTR;
+		//printf("setrts(on)\n");
+	}
+	else
+	{
+		dwFunc = CLRDTR;
+		//printf("setrts(off)\n");
+	}
+
+	bRet = EscapeCommFunction(hSerial, dwFunc);
+
+	if(!bRet)
+	{
+		DWORD err;
+		err =  GetLastError();
+
+		printf("setdtr(%d) EscapeCommFunction() FAILED Err=[%d]\n",on,(int)err);
+	}
+}
+	
+
+
+
+void
+setrts(HANDLE hSerial, int on)
+{
+	BOOL bRet;
+	DWORD dwFunc;
+
+	//printf("setrts()\n");
+
+	if(on)
+	{
+		dwFunc = SETRTS;
+		//printf("setrts(on)\n");
+	}
+	else
+	{
+		dwFunc = CLRRTS;
+		//printf("setrts(off)\n");
+	}
+
+	bRet = EscapeCommFunction(hSerial, dwFunc);
+
+	if(!bRet)
+	{
+		DWORD err;
+		err =  GetLastError();
+
+		printf("setrts(%d) EscapeCommFunction() FAILED Err=[%d]\n",on,(int)err);
+	} 
+}
+
 WinSerialPort::WinSerialPort(const std::string& name, bool isUsb) :
     SerialPort(name), _handle(INVALID_HANDLE_VALUE), _isUsb(isUsb)
 {
@@ -31,6 +95,70 @@ WinSerialPort::WinSerialPort(const std::string& name, bool isUsb) :
 WinSerialPort::~WinSerialPort()
 {
     close();
+}
+
+bool WinSerialPort::initcmd(){
+ 	
+	int i, a, b, outbit;
+	int auth_token = 0xA5A5;
+
+	setdtr(_handle, 0); // DAT
+
+	for (a=0; a< 10; a++) {	
+		for (i=0; i<16; i++){
+			outbit = (auth_token >> i) & 0x01;
+			setdtr(_handle, outbit); // DAT 1
+			usleep(10);
+			setrts(_handle, 0); // CLK
+			usleep(10);
+			setrts(_handle, 1); // CLK
+		}
+	
+		for (b=0; b<4; b++) {
+			setdtr(_handle, 0); // DAT 1
+			usleep(10);
+			setrts(_handle, 0); // CLK
+			usleep(10);
+			setrts(_handle, 1); // CLK
+		}
+		
+		// End of 4 bit code sequence;
+ 	   usleep(100);
+	}
+	return true;
+}
+
+
+bool WinSerialPort::endcmd()
+{
+	int i, a, b, outbit;
+	int auth_token = 0xA5A5;
+
+  	setdtr(_handle, 0); // DAT
+
+	for (a=0; a< 10; a++) {
+	  for (i=0; i<16; i++) {
+	   outbit = (auth_token >> i) & 0x01;
+ 	   setdtr(_handle, outbit); // DAT 1
+	   usleep(10);
+	   setrts(_handle, 0); // CLK
+	   usleep(10);
+	   setrts(_handle, 1); // CLK
+	  }
+
+	  // Now sending reset code sequence [0000]:
+	  for (b=0; b<4; b++) {
+ 	    setdtr(_handle, 1); // DAT 1
+	    usleep(10);
+	    setrts(_handle, 0); // CLK
+	    usleep(10);
+	    setrts(_handle, 1); // CLK
+	  }
+	  // End of 4 bit code sequence;
+
+ 	   usleep(100);
+	}
+    return true;
 }
 
 #ifdef DEBUG
@@ -68,6 +196,7 @@ WinSerialPort::open(int baud, int data, SerialPort::Parity parity, SerialPort::S
         return false;
 
     std::string device = "\\\\.\\" + _name;
+
     _handle = CreateFile(device.c_str(),
                          GENERIC_READ | GENERIC_WRITE,
                          0,
