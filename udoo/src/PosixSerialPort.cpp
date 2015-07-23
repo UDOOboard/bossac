@@ -53,6 +53,14 @@ PosixSerialPort::open(int baud,
                       SerialPort::Parity parity,
                       SerialPort::StopBit stop)
 {
+    FILE *udoo_ard;
+    udoo_ard = fopen("/dev/udoo_ard", "r");  // erase/reset triggered on fopen
+    if (udoo_ard == NULL) {
+        printf("Cannot call erase/reset on Arduno.");
+        return false;
+    }
+    fclose(udoo_ard);
+
     struct termios options;
     speed_t speed;
     std::string dev("/dev/");
