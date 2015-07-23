@@ -369,6 +369,8 @@ main(int argc, char* argv[])
 
         if (config.reset)
             samba.reset();
+
+        printf("Bossac completed!");
     }
     catch (exception& e)
     {

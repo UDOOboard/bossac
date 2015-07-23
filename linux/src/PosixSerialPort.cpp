@@ -25,6 +25,8 @@
 #include <errno.h>
 #include <termios.h>
 #include <errno.h>
+#include <linux/serial.h>
+#include <sys/ioctl.h> 
 
 #include <string>
 
@@ -34,6 +36,53 @@
 #ifndef B921600
 #define B921600 921600
 #endif
+
+
+#define TIOCM_LE        0x001
+#define TIOCM_DTR       0x002
+#define TIOCM_RTS       0x004
+#define TIOCM_ST        0x008
+#define TIOCM_SR        0x010
+#define TIOCM_CTS       0x020
+#define TIOCM_CAR       0x040
+#define TIOCM_RNG       0x080
+#define TIOCM_DSR       0x100
+#define TIOCM_CD        TIOCM_CAR
+#define TIOCM_RI        TIOCM_RNG
+#define TIOCM_OUT1      0x2000
+#define TIOCM_OUT2      0x4000 
+
+void
+setdtr (int fd, int on)
+{
+    int controlbits = TIOCM_DTR;
+    ::ioctl(fd, (on ? TIOCMBIS : TIOCMBIC), &controlbits);
+
+/*
+ *   Set or Clear RTS modem control line
+ *
+ *   Note:  TIOCMSET and TIOCMGET are POSIX
+ *
+ *          the same things:
+ *
+ *          TIOCMODS and TIOCMODG are BSD (4.3 ?)
+ *          MCSETA and MCGETA are HPUX
+ */ 
+}
+
+void
+setrts(int fd, int on)
+{
+  int controlbits;
+
+  ::ioctl(fd, TIOCMGET, &controlbits);
+  if (on) {
+    controlbits |=  TIOCM_RTS;
+  } else {
+    controlbits &= ~TIOCM_RTS;
+  }
+  ioctl(fd, TIOCMSET, &controlbits); 
+}
 
 PosixSerialPort::PosixSerialPort(const std::string& name, bool isUsb) :
     SerialPort(name), _devfd(-1), _isUsb(isUsb), _timeout(0),
@@ -46,6 +95,81 @@ PosixSerialPort::~PosixSerialPort()
     if (_devfd >= 0)
         ::close(_devfd);
 }
+
+bool
+PosixSerialPort::initcmd()
+{
+	int i, a, b, outbit;
+	int auth_token = 0xA5A5;
+
+        std::string dev("/dev/");
+        dev += _name;
+        _devfd = ::open(dev.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
+        if (_devfd == -1)
+            return false;
+
+  	setdtr(_devfd, 0); // DAT
+
+	for (a=0; a< 10; a++) {
+	  for (i=0; i<16; i++) {
+	   outbit = (auth_token >> i) & 0x01;
+ 	   setdtr(_devfd, outbit); // DAT 1
+	   usleep(10);
+	   setrts(_devfd, 0); // CLK
+	   usleep(10);
+	   setrts(_devfd, 1); // CLK
+	  }
+
+	  // Now sending reset code sequence [1111]:
+	  for (b=0; b<4; b++) {
+ 	    setdtr(_devfd, 0); // DAT 1
+	    usleep(10);
+	    setrts(_devfd, 0); // CLK
+	    usleep(10);
+	    setrts(_devfd, 1); // CLK
+	  }
+	  // End of 4 bit code sequence;
+
+ 	   usleep(100);
+	}
+//        ::close(_devfd);
+        return true;
+}
+
+bool
+PosixSerialPort::endcmd()
+{
+	int i, a, b, outbit;
+	int auth_token = 0xA5A5;
+
+  	setdtr(_devfd, 0); // DAT
+
+	for (a=0; a< 10; a++) {
+	  for (i=0; i<16; i++) {
+	   outbit = (auth_token >> i) & 0x01;
+ 	   setdtr(_devfd, outbit); // DAT 1
+	   usleep(10);
+	   setrts(_devfd, 0); // CLK
+	   usleep(10);
+	   setrts(_devfd, 1); // CLK
+	  }
+
+	  // Now sending reset code sequence [0000]:
+	  for (b=0; b<4; b++) {
+ 	    setdtr(_devfd, 1); // DAT 1
+	    usleep(10);
+	    setrts(_devfd, 0); // CLK
+	    usleep(10);
+	    setrts(_devfd, 1); // CLK
+	  }
+	  // End of 4 bit code sequence;
+
+ 	   usleep(100);
+	}
+//        ::close(_devfd);
+        return true;
+}
+
 
 bool
 PosixSerialPort::open(int baud,
