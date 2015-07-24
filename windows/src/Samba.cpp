@@ -589,5 +589,7 @@ Samba::reset(void)
     // This delay is here to give the time to kernel driver to
     // sort out things before closing the port.
     usleep(100000);
+    
+    _port->endcmd();
 }
 

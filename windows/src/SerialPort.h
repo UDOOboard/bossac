@@ -50,6 +50,7 @@ public:
     virtual void close() = 0;
 
     virtual bool initcmd() = 0;
+    virtual bool endcmd() = 0;
     virtual bool isUsb() = 0;
 
     virtual int read(uint8_t* data, int size) = 0;

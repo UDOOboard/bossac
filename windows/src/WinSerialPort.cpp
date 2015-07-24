@@ -102,6 +102,7 @@ bool WinSerialPort::initcmd(){
 	int i, a, b, outbit;
 	int auth_token = 0xA5A5;
 
+	printf("Sending auth and 0xF code\n");
 	setdtr(_handle, 0); // DAT
 
 	for (a=0; a< 10; a++) {	
@@ -134,6 +135,7 @@ bool WinSerialPort::endcmd()
 	int i, a, b, outbit;
 	int auth_token = 0xA5A5;
 
+	printf("Sending auth and 0x0 code\n");
   	setdtr(_handle, 0); // DAT
 
 	for (a=0; a< 10; a++) {
