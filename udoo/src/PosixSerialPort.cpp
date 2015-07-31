@@ -54,11 +54,14 @@ PosixSerialPort::open(int baud,
                       SerialPort::StopBit stop)
 {
     FILE *udoo_ard;
-    udoo_ard = fopen("/dev/udoo_ard", "r");  // erase/reset triggered on fopen
+    udoo_ard = fopen("/dev/udoo_ard", "ab");
     if (udoo_ard == NULL) {
         printf("Cannot call erase/reset on Arduno.");
         return false;
     }
+    const char* erase = "erase";
+    fputs(erase, udoo_ard);
+    usleep(1000);
     fclose(udoo_ard);
 
     struct termios options;

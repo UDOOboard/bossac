@@ -295,7 +295,17 @@ main(int argc, char* argv[])
                 res = samba.connect(portFactory.create(config.portArg));
             if (!res)
             {
-                fprintf(stderr, "No device found on %s\n", config.portArg.c_str());
+                FILE *udoo_ard;
+                udoo_ard = fopen("/dev/udoo_ard", "ab");
+                if (udoo_ard == NULL) {
+                    printf("Cannot call erase/reset on Arduno.");
+                    return false;
+                }
+                const char* erase = "erase";
+                fputs(erase, udoo_ard);
+                fclose(udoo_ard);
+                
+                fprintf(stderr, "No device found on %s. Try again!\n", config.portArg.c_str());
                 return 1;
             }
         }
