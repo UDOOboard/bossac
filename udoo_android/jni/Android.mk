@@ -19,18 +19,18 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE    := bossacjni
 LOCAL_SRC_FILES := \
-	src/WordCopyArm.cpp \
-	src/Samba.cpp \
-	src/Flash.cpp \
-	src/EfcFlash.cpp \
-	src/EefcFlash.cpp \
-	src/FlashFactory.cpp \
-	src/Applet.cpp \
-	src/WordCopyApplet.cpp \
-	src/bossac.cpp \
-	src/Flasher.cpp \
-	src/PosixSerialPort.cpp \
-	src/LinuxPortFactory.cpp
+	WordCopyArm.cpp \
+	Samba.cpp \
+	Flash.cpp \
+	EfcFlash.cpp \
+	EefcFlash.cpp \
+	FlashFactory.cpp \
+	Applet.cpp \
+	WordCopyApplet.cpp \
+	bossac.cpp \
+	Flasher.cpp \
+	PosixSerialPort.cpp \
+	LinuxPortFactory.cpp
 	
 	ifeq ($(APP_OPTIM),debug)
 		LOCAL_CPPFLAGS += -O0 -g3

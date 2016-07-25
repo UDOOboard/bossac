@@ -157,7 +157,7 @@ WriteImage(const char* samImage, bool verify)
                 udoo_ard = fopen("/dev/udoo_ard", "ab");
                 if (udoo_ard == NULL) {
                     printf("Cannot call erase/reset on Arduno.");
-                    return false;
+                    return (eUnhandledException);
                 }
                 const char* erase = "erase";
                 fputs(erase, udoo_ard);
