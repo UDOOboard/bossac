@@ -33,9 +33,6 @@ public:
               SerialPort::StopBit stop = SerialPort::StopBitOne);
     void close();
 
-    bool initcmd();
-    bool endcmd();
-
     bool isUsb() { return _isUsb; };
 
     int read(uint8_t* data, int size);

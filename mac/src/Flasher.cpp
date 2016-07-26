@@ -65,7 +65,7 @@ Flasher::write(const char* filename)
     uint32_t pageNum = 0;
     uint32_t numPages;
     long fsize;
-    int fbytes;
+    size_t fbytes;
 
     infile = fopen(filename, "rb");
     if (!infile)
@@ -122,7 +122,7 @@ Flasher::verify(const char* filename)
     uint32_t pageErrors = 0;
     uint32_t totalErrors = 0;
     long fsize;
-    int fbytes;
+    size_t fbytes;
 
     infile = fopen(filename, "rb");
     if (!infile)
@@ -196,7 +196,7 @@ Flasher::read(const char* filename, long fsize)
     uint8_t buffer[pageSize];
     uint32_t pageNum = 0;
     uint32_t numPages;
-    int fbytes;
+    size_t fbytes;
 
     if (fsize == 0)
         fsize = pageSize * _flash->numPages();
@@ -253,7 +253,7 @@ Flasher::lock(string& regionArg, bool enable)
     else
     {
         size_t pos = 0;
-        int delim;
+        size_t delim;
         uint32_t region;
         string sub;
 
