@@ -168,7 +168,7 @@ BOSSASH_LIBS=-lreadline $(COMMON_LIBS)
 #
 # Main targets
 #
-all:  $(BINDIR)/bossac$(EXE) 
+all: $(BINDIR)/bossa$(EXE) $(BINDIR)/bossac$(EXE) $(BINDIR)/bossash$(EXE)
 
 #
 # Common rules
