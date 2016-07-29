@@ -9,4 +9,5 @@ on the UDOO Linux Kernel.
 ### Supported platforms
 * Linux (tested on Ubuntu 15.04)
 * Windows (tested on Windows 7, 10)
+* MacOSX (tested on MacOSX 10.10, 10.11)
 * UDOOBuntu 2
